@@ -1,2 +1,3 @@
 # ingress-dns-export-controller
-Kubernetes controller to export ingress resources for DNS entries
+
+A simple operator that copies the value in a spec to a ConfigMap. 
