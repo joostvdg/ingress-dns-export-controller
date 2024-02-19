@@ -1,0 +1,14 @@
+{{ if .Values.security.certmanager.generateCert }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "tls.certName" . }}
+spec:
+  secretName: {{ include "tls.secretName" . }}
+  issuerRef:
+    name: {{ .Values.security.certmanager.issuer.name }}
+    kind: {{ .Values.security.certmanager.issuer.kind }}
+  commonName: {{ .Values.security.certmanager.host }}
+  dnsNames:
+    - {{ .Values.security.certmanager.host }}
+{{ end }}

@@ -1,0 +1,19 @@
+{{ if .Values.istio.enabled -}}
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: {{ include "server.fullname" . }}
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: {{ include "tls.secretName" . }}
+      hosts:
+        - {{ .Values.hostname }}
+{{- end }}

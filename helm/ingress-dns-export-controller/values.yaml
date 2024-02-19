@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/joostvdg/ingress-dns-exporter
+  pullPolicy: IfNotPresent
+  tag: 0.1.0
+
+hostname: test.example.com
+replicaCount: 1
+
+security:
+  useGeneratedCert: false
+  caOnly: false
+  certmanager:
+    generateCert: false
+    issuer:
+      name: ""
+      kind: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+
+istio:
+  gateway:
+    enabled: true
+  virtualService:
+    enabled: true
+
