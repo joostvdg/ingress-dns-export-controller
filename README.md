@@ -5,13 +5,16 @@ A simple operator that copies the value in a spec to a ConfigMap.
 ## TODO
 
 * [ ] Add tests
-* [ ] buid a docker image
-  * [ ] Using Wolfi or Azul
-  * [ ] Using a multi-stage build
-  * [ ] Using a distroless image
-  * [ ] Multi-arch build
-* [ ] Add a helm chart
-  * [ ] Build & push the chart
+* [ X ] buid a docker image
+  * [ X ] Using Azul
+  * [ X ] Using a multi-stage build
+  * [ X ] Multi-arch build
+  * [ ] Using Wolfi
+* [ X ] Add a helm chart
+  * [ X ] Build & push the chart
+  * [  ] Use the chart in cluster
 * [ ] Create Tekton pipeline
   * [ ] Build & push the image
   * [ ] Build & push the chart
+  * [ ] Trigger the pipeline on push
+

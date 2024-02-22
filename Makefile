@@ -1,9 +1,12 @@
 # Configuration
-IMAGE_REPOSITORY := your-repository/your-image-name
-IMAGE_TAG := latest
+LOCAL_VERSION = $(shell git describe --tags --always)
+PACKAGE_VERSION ?= "0.1.0-$(LOCAL_VERSION)"
+IMAGE_REPOSITORY := harbor.home.lab/homelab/ingress-dns-export-controller
+IMAGE_TAG := "$(PACKAGE_VERSION)"
 HELM_CHART_DIR := helm/ingress-dns-export-controller
-HELM_CHART_REPO := your-helm-chart-repository
 HELM_CHART_NAME := ingress-dns-export-controller
+HELM_CHART_RELEASE_DIR := helm/releases
+HELM_CHART_VERSION := "$(PACKAGE_VERSION)"
 BUILDER_NAME := mybuilder
 PLATFORMS := linux/amd64,linux/arm64
 SPRING_BOOT_DEV_PROFILE := dev
@@ -28,19 +31,21 @@ build:
 # Helm commands
 .PHONY: package
 package:
-	helm package $(HELM_CHART_DIR) --destination $(HELM_CHART_DIR)/releases
+	helm package ${HELM_CHART_DIR} \
+		--app-version ${PACKAGE_VERSION} \
+		--version ${HELM_CHART_VERSION} \
+		--destination ${HELM_CHART_RELEASE_DIR}
 
 .PHONY: publish
-publish:
-	helm repo add myrepo $(HELM_CHART_REPO)
-	helm push $(HELM_CHART_DIR)/releases/$(HELM_CHART_NAME)-*.tgz myrepo
+publish: package
+	helm push \
+		--ca-file=/home/joostvdg/projects/homelab/certs/ca.pem \
+		${HELM_CHART_RELEASE_DIR}/${HELM_CHART_NAME}-${HELM_CHART_VERSION}.tgz \
+		"oci://harbor.home.lab:443/charts"
 
 # Maven Spring Boot commands
 .PHONY: run-dev
 run-dev:
 	mvn spring-boot:run -Dspring-boot.run.profiles=$(SPRING_BOOT_DEV_PROFILE)
 
-# Utility commands
-.PHONY: clean
-clean:
-	-rm -rf $(HELM_CHART_DIR)/releases
+

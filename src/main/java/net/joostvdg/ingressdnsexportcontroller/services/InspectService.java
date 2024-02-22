@@ -3,14 +3,10 @@ package net.joostvdg.ingressdnsexportcontroller.services;
 import com.google.gson.JsonElement;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceList;
-import io.kubernetes.client.util.ClientBuilder;
-import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.generic.dynamic.DynamicKubernetesApi;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +35,15 @@ public class InspectService {
   @Value("${cluster.url}")
   private String clusterApiServerIp;
 
+  private final CoreV1Api coreV1Api;
+
+  private final ApiClient apiClient;
+
+  public InspectService(CoreV1Api coreV1Api, ApiClient apiClient) {
+    this.coreV1Api = coreV1Api;
+    this.apiClient = apiClient;
+  }
+
   @PostConstruct
   private void init() {
     // This method will be called once dependency injection is done to perform any initialization.
@@ -54,14 +59,6 @@ public class InspectService {
 
   @Scheduled(fixedRate = 30000)
   public void fetchVirtualServices() {
-    ApiClient apiClient = null;
-    try {
-      apiClient = ClientBuilder.standard().build();
-    } catch (IOException e) {
-      logger.error("Exception when calling ClientBuilder#standard().build()", e);
-      throw new RuntimeException(e);
-    }
-
     DynamicKubernetesApi dynamicApi =
         new DynamicKubernetesApi("networking.istio.io", "v1beta1", "virtualservices", apiClient);
 
@@ -111,56 +108,48 @@ public class InspectService {
 
   @Scheduled(fixedRate = 30000)
   public void fetchServices() {
+
+    V1ServiceList serviceList = null;
     try {
-      ApiClient client = null;
-      try {
-        client = Config.defaultClient();
-      } catch (IOException e) {
-        logger.error("Exception when calling ClientBuilder#standard().build()", e);
-        throw new RuntimeException(e);
-      }
-      Configuration.setDefaultApiClient(client);
-
-      CoreV1Api api = new CoreV1Api();
-      V1ServiceList serviceList = api.listServiceForAllNamespaces().execute();
-      synchronized (services) {
-        services.clear();
-        services.addAll(serviceList.getItems());
-      }
-
-      for (V1Service service : services) {
-        if (Objects.equals(
-            Objects.requireNonNull(service.getMetadata()).getName(), "istio-ingressgateway")) {
-          String namespace = service.getMetadata().getNamespace();
-          String name = service.getMetadata().getName();
-          String clusterIP = Objects.requireNonNull(service.getSpec()).getClusterIP();
-          String externalIp = "";
-          if (service.getStatus() != null
-              && service.getStatus().getLoadBalancer() != null
-              && service.getStatus().getLoadBalancer().getIngress() != null
-              && !service.getStatus().getLoadBalancer().getIngress().isEmpty()) {
-            externalIp = service.getStatus().getLoadBalancer().getIngress().getFirst().getIp();
-          }
-          logger.info(
-              "Found istio-ingressgateway: "
-                  + name
-                  + " in namespace: "
-                  + namespace
-                  + " with clusterIP: "
-                  + clusterIP
-                  + " and externalIP: "
-                  + externalIp);
-          istioService =
-              new net.joostvdg.ingressdnsexportcontroller.model.Service(
-                  name, namespace, clusterIP, externalIp);
-        }
-      }
-
-      logger.info("Services updated.");
-    } catch (ApiException e) {
-      logger.error("Exception when calling CoreV1Api#listServiceForAllNamespaces", e);
-      return;
+      serviceList = coreV1Api.listServiceForAllNamespaces().execute();
+    } catch (ApiException ex) {
+      logger.error("Exception when calling CoreV1Api#listServiceForAllNamespaces", ex);
+      throw new RuntimeException(ex);
     }
+    synchronized (services) {
+      services.clear();
+      services.addAll(serviceList.getItems());
+    }
+
+    for (V1Service service : services) {
+      if (Objects.equals(
+          Objects.requireNonNull(service.getMetadata()).getName(), "istio-ingressgateway")) {
+        String namespace = service.getMetadata().getNamespace();
+        String name = service.getMetadata().getName();
+        String clusterIP = Objects.requireNonNull(service.getSpec()).getClusterIP();
+        String externalIp = "";
+        if (service.getStatus() != null
+            && service.getStatus().getLoadBalancer() != null
+            && service.getStatus().getLoadBalancer().getIngress() != null
+            && !service.getStatus().getLoadBalancer().getIngress().isEmpty()) {
+          externalIp = service.getStatus().getLoadBalancer().getIngress().getFirst().getIp();
+        }
+        logger.info(
+            "Found istio-ingressgateway: "
+                + name
+                + " in namespace: "
+                + namespace
+                + " with clusterIP: "
+                + clusterIP
+                + " and externalIP: "
+                + externalIp);
+        istioService =
+            new net.joostvdg.ingressdnsexportcontroller.model.Service(
+                name, namespace, clusterIP, externalIp);
+      }
+    }
+
+    logger.info("Services updated.");
   }
 
   public List<net.joostvdg.ingressdnsexportcontroller.model.Service> getSafeServicesCopy() {
