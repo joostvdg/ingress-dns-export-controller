@@ -2,9 +2,9 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY pom.xml .
-RUN mvn dependency:go-offline -e -C -B --show-version
+RUN mvn dependency:go-offline -e -C -B --show-version --no-transfer-progress
 COPY src src
-RUN mvn package -e -C -B --show-version
+RUN mvn package -e -C -B --show-version --no-transfer-progress
 
 # Stage 2: Create the runtime image
 FROM azul/zulu-openjdk:21.0.2-jre AS runtime

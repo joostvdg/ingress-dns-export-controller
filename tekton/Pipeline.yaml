@@ -1,8 +1,8 @@
 apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
-  name: gitstafette-image-builds
-  namespace: gsf
+  name: idec-image-builds
+  namespace: idec
 spec:
   description: |
     This pipeline clones a git repo, then echoes the README file to the stdout.
@@ -30,7 +30,7 @@ spec:
     - name: repo
       description: repo to push to
       type: string
-      default: joostvdg/gitstafette/server
+      default: joostvdg/idec
     - name: tag
       description: tag to push to
       type: string
@@ -98,19 +98,19 @@ spec:
           value: $(params.dockerfile)
         - name: EXTRA_ARGS
           value: [--customPlatform=linux/arm64, --skip-tls-verify-registry=harbor.home.lab]
-    - name: server-image-build-and-push-amd64
-      runAfter: ["git-next-tag"]
-      taskRef:
-        name: kaniko
-      workspaces:
-        - name: source
-          workspace: checkout
-        - name: dockerconfig
-          workspace: registry-credentials
-      params:
-        - name: IMAGE
-          value: "$(params.registry)/$(params.repo):$(tasks.git-next-tag.results.NEXT_TAG)"
-        - name: DOCKERFILE
-          value: $(params.dockerfile)
-        - name: EXTRA_ARGS
-          value: [--customPlatform=linux/amd64, --skip-tls-verify-registry=harbor.home.lab]
+#    - name: server-image-build-and-push-amd64
+#      runAfter: ["git-next-tag"]
+#      taskRef:
+#        name: kaniko
+#      workspaces:
+#        - name: source
+#          workspace: checkout
+#        - name: dockerconfig
+#          workspace: registry-credentials
+#      params:
+#        - name: IMAGE
+#          value: "$(params.registry)/$(params.repo):$(tasks.git-next-tag.results.NEXT_TAG)"
+#        - name: DOCKERFILE
+#          value: $(params.dockerfile)
+#        - name: EXTRA_ARGS
+#          value: [--customPlatform=linux/amd64, --skip-tls-verify-registry=harbor.home.lab]

@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: idec-image-builds-run-
+  namespace: idec
+spec:
+  pipelineRef:
+    name: idec-image-builds
+  workspaces:
+    - name: checkout
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: registry-credentials
+      secret:
+        secretName: kaniko-harbor
+  params:
+    - name: repo-url
+      value: https://github.com/joostvdg/ingress-dns-export-controller.git
+    - name: base
+      value: "0.1"
+    - name: gitrevision
+      value: main
+    - name: registry
+      value: harbor.home.lab
+    - name: repo
+      value: homelab/idec
