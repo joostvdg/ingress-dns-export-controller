@@ -14,7 +14,13 @@ A simple operator that copies the value in a spec to a ConfigMap.
   * [ X ] Build & push the chart
   * [  ] Use the chart in cluster
 * [ ] Create Tekton pipeline
-  * [ ] Build & push the image
-  * [ ] Build & push the chart
+  * [ X ] Build & push the image
+  * [  ] Add maven linting/code coverage
+  * [  ] Add helm linting
+  * [  ] Build & push the chart
+  * [  ] Add image scanning
+  * [ ] Use the chart in cluster
   * [ ] Trigger the pipeline on push
-
+* [ ] Monitoring
+  * [ ] Add Micrometer
+  * [ ] Add OpenTelemetry

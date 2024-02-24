@@ -1,3 +1,4 @@
+/* (C)2024 */
 package net.joostvdg.ingressdnsexportcontroller.model;
 
 import java.util.Objects;
@@ -64,9 +65,10 @@ public class DNSEntry {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    DNSEntry dnsEntry = (DNSEntry) o;
-    return Objects.equals(fqdn, dnsEntry.fqdn) && Objects.equals(ip, dnsEntry.ip);
+    if (!(o instanceof DNSEntry dnsEntry)) return false;
+
+    if (!fqdn.equals(dnsEntry.fqdn)) return false;
+    return clusterIP.equals(dnsEntry.clusterIP);
   }
 
   @Override
