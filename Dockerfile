@@ -4,6 +4,7 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline -e -C -B --show-version --no-transfer-progress
 COPY src src
+COPY ./.mvn/jvm.config ./.mvn/jvm.config
 RUN mvn package -e -C -B --show-version --no-transfer-progress -DskipTests  # we assume tests are run before we get here
 
 # Stage 2: Create the runtime image
