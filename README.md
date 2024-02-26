@@ -24,3 +24,8 @@ A simple operator that copies the value in a spec to a ConfigMap.
 * [ ] Monitoring
   * [ ] Add Micrometer
   * [ ] Add OpenTelemetry
+*  [ ] Pipeline improvements
+  * [  ] block image build if maven linting fails
+  * [  ] block chart build if helm linting fails
+  * [  ] block chart build if image scanning fails
+  * [  ] only push tag if both image and maven linting pass
