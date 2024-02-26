@@ -6,6 +6,10 @@ metadata:
 spec:
   pipelineRef:
     name: idec-image-builds
+  taskRunTemplate:
+    podTemplate:
+      securityContext:
+        fsGroup: 65532
   workspaces:
     - name: checkout
       volumeClaimTemplate:
@@ -18,6 +22,10 @@ spec:
     - name: registry-credentials
       secret:
         secretName: kaniko-harbor
+    - name: maven-settings # use empty dir to satisfy the task
+      emptyDir: {}
+    - name: helm-config # use empty dir to satisfy the task
+      emptyDir: {}
   params:
     - name: repo-url
       value: https://github.com/joostvdg/ingress-dns-export-controller.git

@@ -44,6 +44,14 @@ spec:
       description: |
         This workspace contains the registry credentials, so they can be read by the
         next task.
+    - name: maven-settings
+      description: |
+          This workspace contains the maven settings, so they can be read by the
+          next task.
+    - name: helm-config
+      description: |
+        This workspace contains the helm repository config.
+        As the container has a read-only file system, the helm config is mounted as a workspace.
   tasks:
     - name: fetch-source
       taskRef:
@@ -68,6 +76,22 @@ spec:
           value: $(params.base)
         - name: image
           value: $(params.image)
+    - name: maven-run
+      taskRef:
+        name: maven
+      runAfter: ["fetch-source"]
+      params:
+        - name: GOALS
+          value:
+            - clean
+            - verify
+        - name: MAVEN_IMAGE
+          value: maven:3.9-eclipse-temurin-21
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: checkout
     - name: create-and-push-git-tag
       runAfter: ["git-next-tag"]
       taskRef:
@@ -82,7 +106,7 @@ spec:
           value: tekton-bot
         - name: GITHUB_EMAIL
           value: joostvdg+tekton-bot@gmail.com
-    - name: server-image-build-and-push-arm64
+    - name: kaniko-arm64
       runAfter: ["git-next-tag"]
       taskRef:
         name: kaniko
@@ -98,7 +122,7 @@ spec:
           value: $(params.dockerfile)
         - name: EXTRA_ARGS
           value: [--customPlatform=linux/arm64, --skip-tls-verify-registry=harbor.home.lab]
-#    - name: server-image-build-and-push-amd64
+#    - name: kaniko-amd64
 #      runAfter: ["git-next-tag"]
 #      taskRef:
 #        name: kaniko
@@ -114,3 +138,80 @@ spec:
 #          value: $(params.dockerfile)
 #        - name: EXTRA_ARGS
 #          value: [--customPlatform=linux/amd64, --skip-tls-verify-registry=harbor.home.lab]
+    - name: publish-helm-chart
+      runAfter: ["git-next-tag"]
+      taskRef:
+        name: helm-publish-package
+      workspaces:
+        - name: source
+          workspace: checkout
+        - name: helm
+          workspace: helm-config
+      params:
+        - name: HELM_CA_FILE_SECRET
+          value: kearos-ca
+        - name: REGISTRY_SECRET_NAME
+          value: harbor-helm
+        - name: PACKAGE_VERSION
+          value: $(tasks.git-next-tag.results.NEXT_TAG)
+        - name: HELM_CHART_VERSION
+          value: $(tasks.git-next-tag.results.NEXT_TAG)
+        - name: HELM_CHART_NAME
+          value: ingress-dns-export-controller
+        - name: HELM_CHART_DIR
+          value: helm
+        - name: HELM_REPO
+          value: charts
+        - name: HELM_REGISTRY_HOST
+          value: "harbor.home.lab:443"
+        - name: HELM_REGISTRY_URL
+          value: "oci://harbor.home.lab:443"
+  finally:
+    - name: notify-build-failure
+      when:
+        - input: $(tasks.maven-run.status)
+          operator: in
+          values: ["Failed"]
+      taskRef:
+        name: send-to-webhook-slack
+      params:
+        - name: webhook-secret
+          value: slack-webhook
+        - name: message
+          value: "Maven Build failed [$(params.repo-url) - $(params.gitrevision)]"
+    - name: notify-fetch-failure
+      when:
+        - input: $(tasks.fetch-source.status)
+          operator: in
+          values: ["Failed"]
+      taskRef:
+        name: send-to-webhook-slack
+      params:
+        - name: webhook-secret
+          value: slack-webhook
+        - name: message
+          value: "Cannot fetch source [$(params.repo-url) - $(params.gitrevision)]"
+    - name: notify-kaniko-arm-failure
+      when:
+        - input: $(tasks.kaniko-arm64.status)
+          operator: in
+          values: ["Failed"]
+      taskRef:
+        name: send-to-webhook-slack
+      params:
+        - name: webhook-secret
+          value: slack-webhook
+        - name: message
+          value: "Kaniko ARM64 Build failed [$(params.repo-url) - $(params.gitrevision)]"
+    - name: notify-helm-failure
+      when:
+        - input: $(tasks.publish-helm-chart.status)
+          operator: in
+          values: ["Failed"]
+      taskRef:
+        name: send-to-webhook-slack
+      params:
+        - name: webhook-secret
+          value: slack-webhook
+        - name: message
+          value: "Helm Publish failed [$(params.repo-url) - $(params.gitrevision)]"
