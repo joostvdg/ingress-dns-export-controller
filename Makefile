@@ -48,4 +48,11 @@ publish: package
 run-dev:
 	mvn spring-boot:run -Dspring-boot.run.profiles=$(SPRING_BOOT_DEV_PROFILE)
 
+.PHONY: helm-validate
+helm-validate:
+	helm lint ./helm/ingress-dns-export-controller
+	polaris audit --helm-chart ./helm/ingress-dns-export-controller --helm-values ./helm/ingress-dns-export-controller/example-values.yaml --format=pretty
 
+.PHONY: helm-template
+helm-template:
+	helm template ingress-dns-export-controller ./helm/ingress-dns-export-controller --values ./helm/ingress-dns-export-controller/example-values.yaml | yq
