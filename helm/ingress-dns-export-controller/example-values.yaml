@@ -1,0 +1,44 @@
+namespace: "idec"
+hostname: idec-grape.home.lab
+
+security:
+  useGeneratedCert: false
+  certmanager:
+    generateCert: true
+    issuer:
+      name: "kearos-issuer"
+      kind: "ClusterIssuer"
+
+securityContext:
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  privileged: false
+  allowPrivilegeEscalation: false
+
+image:
+  pullPolicy: IfNotPresent
+  tag: 0.1.27
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 128Mi
+  limits:
+    memory: 256Mi
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+
+httpproxy:
+  enabled: false
+
+istio:
+  enabled: true
+
+# map to arm64 nodes
+nodeSelector:
+    kubernetes.io/arch: arm64

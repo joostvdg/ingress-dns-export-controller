@@ -47,7 +47,7 @@ Selector labels
 */}}
 {{- define "server.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "server.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/instance: {{ include "server.fullname" . }}
 {{- end }}
 
 {{/*
@@ -65,9 +65,9 @@ Create the name of the service account to use
 certificate name and secret
 */}}
 {{- define "tls.secretName" -}}
-{{- default (cat .Values.httpproxy.fqdn "-tls" | replace "." "-" | replace " " "") }}
+{{- default (cat .Values.hostname "-tls" | replace "." "-" | replace " " "") }}
 {{- end }}
 
 {{- define "tls.certName" -}}
-{{- default (cat .Values.httpproxy.fqdn | replace "." "-") }}
+{{- default (cat .Values.hostname | replace "." "-") }}
 {{- end }}
