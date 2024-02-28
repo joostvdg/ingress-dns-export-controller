@@ -2,6 +2,11 @@ cluster:
   name: "local"
   url: "127.0.0.1:443"
 
+spring:
+  threads:
+    virtual:
+      enabled: true
+
 management:
   endpoints:
     enabled-by-default: true
