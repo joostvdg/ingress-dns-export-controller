@@ -10,7 +10,7 @@ spec:
     - {{ include "server.fullname" . }}
 
   http:
-    route:
+    - route:
       - destination:
           host: {{ include "server.fullname" . }}
           port:
