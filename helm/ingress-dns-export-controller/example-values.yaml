@@ -16,6 +16,12 @@ securityContext:
   privileged: false
   allowPrivilegeEscalation: false
 
+podLabels:
+  app: "idec-grape"
+
+podAnnotations:
+  sidecar.istio.io/rewriteAppHTTPProbers: "false"
+
 image:
   pullPolicy: IfNotPresent
   tag: 0.1.27
