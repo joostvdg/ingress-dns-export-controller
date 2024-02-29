@@ -10,13 +10,9 @@ spec:
     - {{ include "server.fullname" . }}
 
   http:
-    - match:
-        - port: 443
-          uri:
-            prefix: /
-      route:
-        - destination:
-            host: {{ include "server.fullname" . }}
-            port:
-              number: 80
+    route:
+      - destination:
+        host: {{ include "server.fullname" . }}
+        port:
+          number: 80
 {{- end }}

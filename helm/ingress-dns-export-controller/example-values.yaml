@@ -1,5 +1,6 @@
 namespace: "idec"
 hostname: idec-grape.home.lab
+fullnameOverride: "idec-grape"
 
 security:
   useGeneratedCert: false
