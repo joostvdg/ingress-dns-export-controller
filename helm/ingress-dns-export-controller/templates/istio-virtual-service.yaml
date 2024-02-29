@@ -12,7 +12,7 @@ spec:
   http:
     route:
       - destination:
-        host: {{ include "server.fullname" . }}
-        port:
-          number: 80
+          host: {{ include "server.fullname" . }}
+          port:
+            number: 80
 {{- end }}
