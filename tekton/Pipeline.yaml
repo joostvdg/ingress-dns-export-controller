@@ -178,7 +178,7 @@ spec:
         - name: webhook-secret
           value: slack-webhook
         - name: message
-          value: "Maven Build failed [$(params.repo-url) - $(params.gitrevision)]"
+          value: "Maven Build failed [$(params.repo-url) - $(params.gitrevision)] ---- $(tasks.maven-run.status)"
     - name: notify-fetch-failure
       when:
         - input: $(tasks.fetch-source.status)
@@ -190,7 +190,7 @@ spec:
         - name: webhook-secret
           value: slack-webhook
         - name: message
-          value: "Cannot fetch source [$(params.repo-url) - $(params.gitrevision)]"
+          value: "Cannot fetch source [$(params.repo-url) - $(params.gitrevision)] -----  $(tasks.fetch-source.status)"
     - name: notify-kaniko-arm-failure
       when:
         - input: $(tasks.kaniko-arm64.status)
@@ -202,7 +202,7 @@ spec:
         - name: webhook-secret
           value: slack-webhook
         - name: message
-          value: "Kaniko ARM64 Build failed [$(params.repo-url) - $(params.gitrevision)]"
+          value: "Kaniko ARM64 Build failed [$(params.repo-url) - $(params.gitrevision)] ------ $(tasks.kaniko-arm64.status)"
     - name: notify-helm-failure
       when:
         - input: $(tasks.publish-helm-chart.status)
@@ -214,4 +214,4 @@ spec:
         - name: webhook-secret
           value: slack-webhook
         - name: message
-          value: "Helm Publish failed [$(params.repo-url) - $(params.gitrevision)]"
+          value: "Helm Publish failed [$(params.repo-url) - $(params.gitrevision)] ----- $(tasks.publish-helm-chart.status)"
