@@ -1,3 +1,4 @@
+/* (C)2024 */
 package net.joostvdg.ingressdnsexportcontroller.controllers;
 
 import java.util.List;

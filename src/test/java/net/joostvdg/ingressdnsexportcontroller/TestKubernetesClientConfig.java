@@ -1,3 +1,4 @@
+/* (C)2024 */
 package net.joostvdg.ingressdnsexportcontroller;
 
 import io.kubernetes.client.openapi.ApiClient;

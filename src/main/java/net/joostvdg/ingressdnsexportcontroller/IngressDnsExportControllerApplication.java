@@ -1,3 +1,4 @@
+/* (C)2024 */
 package net.joostvdg.ingressdnsexportcontroller;
 
 import org.springframework.boot.SpringApplication;
