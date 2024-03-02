@@ -1,3 +1,4 @@
+/* (C)2024 */
 package net.joostvdg.ingressdnsexportcontroller.services;
 
 import com.google.gson.JsonElement;
@@ -7,10 +8,7 @@ import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Service;
 import io.kubernetes.client.openapi.models.V1ServiceList;
 import io.kubernetes.client.util.generic.dynamic.DynamicKubernetesApi;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import javax.annotation.PostConstruct;
 import net.joostvdg.ingressdnsexportcontroller.model.DNSEntry;
 import org.slf4j.Logger;
@@ -22,11 +20,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class InspectService {
 
-  private final List<V1Service> services = Collections.synchronizedList(new ArrayList<>());
+  private final Set<V1Service> services = Collections.synchronizedSet(new HashSet<>());
 
-  private final List<DNSEntry> dnsEntries = Collections.synchronizedList(new ArrayList<>());
+  private final Set<DNSEntry> dnsEntries = Collections.synchronizedSet(new HashSet<>());
 
   private final Logger logger = LoggerFactory.getLogger(InspectService.class);
+  private final CoreV1Api coreV1Api;
+  private final ApiClient apiClient;
   private net.joostvdg.ingressdnsexportcontroller.model.Service istioService;
 
   @Value("${cluster.name}")
@@ -34,10 +34,6 @@ public class InspectService {
 
   @Value("${cluster.url}")
   private String clusterApiServerIp;
-
-  private final CoreV1Api coreV1Api;
-
-  private final ApiClient apiClient;
 
   public InspectService(CoreV1Api coreV1Api, ApiClient apiClient) {
     this.coreV1Api = coreV1Api;
@@ -175,6 +171,7 @@ public class InspectService {
     List<DNSEntry> dnsEntriesCopy;
     synchronized (dnsEntries) {
       dnsEntriesCopy = new ArrayList<DNSEntry>(dnsEntries);
+      dnsEntriesCopy.sort(Comparator.comparing(DNSEntry::getFqdn));
     }
     return dnsEntriesCopy;
   }

@@ -13,6 +13,27 @@ public class Service {
     this.externalIP = externalIP;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Service)) {
+      return false;
+    }
+
+    Service service = (Service) o;
+
+    if (!name.equals(service.name)) return false;
+
+    return namespace.equals(service.namespace);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = name.hashCode();
+    result = 31 * result + namespace.hashCode();
+    return result;
+  }
+
   public String getName() {
     return name;
   }
