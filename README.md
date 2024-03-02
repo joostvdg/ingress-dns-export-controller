@@ -9,17 +9,16 @@ A simple operator that copies the value in a spec to a ConfigMap.
   * [ X ] Using Azul
   * [ X ] Using a multi-stage build
   * [ X ] Multi-arch build
-  * [ ] Using Wolfi
+  * [ X ] Using Wolfi
 * [ X ] Add a helm chart
   * [ X ] Build & push the chart
-  * [  ] Use the chart in cluster
+  * [ X ] Use the chart in cluster
 * [ ] Create Tekton pipeline
   * [ X ] Build & push the image
-  * [  ] Add maven linting/code coverage
-  * [  ] Add helm linting
-  * [  ] Build & push the chart
-  * [  ] Add image scanning
-  * [ ] Use the chart in cluster
+  * [ X ] Add maven linting/code coverage
+  * [ X ] Add helm linting
+  * [ X ] Build & push the chart
+  * [ X ] Use the chart in cluster
   * [ ] Trigger the pipeline on push
 * [ ] Monitoring
   * [ ] Add Micrometer
@@ -29,3 +28,9 @@ A simple operator that copies the value in a spec to a ConfigMap.
   * [  ] block chart build if helm linting fails
   * [  ] block chart build if image scanning fails
   * [  ] only push tag if both image and maven linting pass
+  * [  ] Add image scanning
+  * [  ] Add src/dependecy scanning
+  * [  ] Add deployment
+  * [  ] Add helm tests
+  * [  ] Add multi-arch image build
+* [ ] Add ServceAccount with RBAC to Helm chart
