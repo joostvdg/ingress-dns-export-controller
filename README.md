@@ -5,11 +5,11 @@ A simple operator that copies the value in a spec to a ConfigMap.
 ## TODO
 
 * [ ] Add tests
-* [ X ] buid a docker image
-  * [ X ] Using Azul
-  * [ X ] Using a multi-stage build
-  * [ X ] Multi-arch build
-  * [ X ] Using Wolfi
+* [X] buid a docker image
+  * [X] Using Azul
+  * [X] Using a multi-stage build
+  * [X] Multi-arch build
+  * [X] Using Wolfi
 * [ X ] Add a helm chart
   * [ X ] Build & push the chart
   * [ X ] Use the chart in cluster
