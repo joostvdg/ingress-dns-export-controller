@@ -35,6 +35,22 @@ spec:
       description: tag to push to
       type: string
       default: latest
+    - name: commit_message
+      type: string
+      description: The commit message of the git commit that triggered this pipeline.
+      default: "N/A"
+    - name: commit_author
+      type: string
+      default: "N/A"
+      description: The author of the git commit that triggered this pipeline.
+    - name: commit_author_email
+      type: string
+      description: The email of the author of the git commit that triggered this pipeline.
+      default: "N/A"
+    - name: commit_timestamp
+      type: string
+      description: The timestamp of the git commit that triggered this pipeline.
+      default: "N/A"
   workspaces:
     - name: checkout
       description: |
@@ -52,7 +68,56 @@ spec:
       description: |
         This workspace contains the helm repository config.
         As the container has a read-only file system, the helm config is mounted as a workspace.
+  results:
+    - name: IMAGE_URL
+      type: string
+      description: The image that was built.
+      value: $(tasks.kaniko-arm64.results.IMAGE_URL)
+    - name: IMAGE_DIGEST
+      type: string
+      description: The digest of the image that was built.
+      value: $(tasks.kaniko-arm64.results.IMAGE_DIGEST)
+    - name: VERSION
+      description: The version of the image that was built.
+      type: string
+      value: $(tasks.git-next-tag.results.NEXT_TAG)
+    - name: REPO_URL
+      type: string
+      value: $(tasks.fetch-source.results.url)
+      description: The URL of the git repository that was cloned.
+    - name: REPO_COMMIT_TIMESTAMP
+      type: string
+      value: $(tasks.fetch-source.results.committer-date)
+      description: The branch of the git repository that was cloned.
+    - name: REPO_COMMIT
+      type: string
+      value: $(tasks.fetch-source.results.commit)
+      description: The commit of the git repository that was cloned.
+    - name: COMMIT_MESSAGE
+      type: string
+      value: $(tasks.metadata-collection.results.COMMIT_MESSAGE)
+    - name: COMMIT_AUTHOR
+      type: string
+      value: $(tasks.metadata-collection.results.COMMIT_AUTHOR)
+    - name: COMMIT_AUTHOR_EMAIL
+      type: string
+      value: $(tasks.metadata-collection.results.COMMIT_AUTHOR_EMAIL)
+    - name: COMMIT_TIMESTAMP
+      type: string
+      value: $(tasks.metadata-collection.results.COMMIT_TIMESTAMP)
   tasks:
+    - name: metadata-collection
+      taskRef:
+        name: git-push-metadata-collector
+      params:
+        - name: commit_message
+          value: $(params.commit_message)
+        - name: commit_author
+          value: $(params.commit_author)
+        - name: commit_author_email
+          value: $(params.commit_author_email)
+        - name: commit_timestamp
+          value: $(params.commit_timestamp)
     - name: fetch-source
       taskRef:
         name: git-clone
@@ -85,6 +150,11 @@ spec:
           value:
             - clean
             - verify
+            - -e
+            - -C
+            - -B
+            - --show-version
+            - --no-transfer-progress
         - name: MAVEN_IMAGE
           value: maven:3.9-eclipse-temurin-21
       workspaces:
