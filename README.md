@@ -10,9 +10,9 @@ A simple operator that copies the value in a spec to a ConfigMap.
   * [X] Using a multi-stage build
   * [X] Multi-arch build
   * [X] Using Wolfi
-* [ X ] Add a helm chart
-  * [ X ] Build & push the chart
-  * [ X ] Use the chart in cluster
+* [X] Add a helm chart
+  * [X] Build & push the chart
+  * [X] Use the chart in cluster
 * [ X ] Create Tekton pipeline
   * [ X ] Build & push the image
   * [ X ] Add maven linting/code coverage
