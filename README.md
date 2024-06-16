@@ -34,3 +34,7 @@ A simple operator that copies the value in a spec to a ConfigMap.
   * [  ] Add helm tests
   * [  ] Add multi-arch image build
 * [ ] Add ServceAccount with RBAC to Helm chart
+
+## Testing for Datadog
+
+Test - 1
