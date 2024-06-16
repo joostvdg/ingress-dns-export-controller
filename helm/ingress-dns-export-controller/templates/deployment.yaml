@@ -21,6 +21,15 @@ spec:
     spec:
       containers:
         - name: {{ .Chart.Name }}
+          env:
+            - name: SERVICE_NAME
+              value: {{ include "server.fullname" . }}
+            - name: CHART_VERSION
+              value: {{ .Chart.Version }}
+            - name: IMAGE_VERSION
+              value: {{ .Values.image.tag }}
+            - name: DD_LOGS_INJECTION
+              value: "true"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
